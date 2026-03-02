@@ -92,6 +92,7 @@ void Stage::TitleUpdate()
 	if (Input::IsKeyDown(KEY_INPUT_E))
 	{
 		stageState = 1;
+
 	}
 }
 
