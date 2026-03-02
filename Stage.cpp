@@ -67,7 +67,7 @@ void Stage::Initialize()
 {
 	objects.clear(); //オブジェクトの保管庫を空にする
 
-	stageState = 2; //タイトル画面にする
+	stageState = 0; //タイトル画面にする
 	
 	gameScore_ = 0;
 	//変数playerは、ローカル変数なので、この関数が終わると消えてしまう。
@@ -89,6 +89,10 @@ void Stage::Initialize()
 
 void Stage::TitleUpdate()
 {
+	if (Input::IsKeyDown(KEY_INPUT_E))
+	{
+		stageState = 1;
+	}
 }
 
 void Stage::PlayUpdate()
