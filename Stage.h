@@ -16,10 +16,12 @@ public:
 	void TitleUpdate();
 	void PlayUpdate();
 	void GameOverUpdate();
+	void GameClearUpdate();
 
 	void TitleDraw();
 	void PlayDraw();
 	void GameOverDraw();
+	void GameClearDraw();
 
 	//ëSëÃÇÃUpdateÅADraw
 	void Update();

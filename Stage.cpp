@@ -22,6 +22,7 @@ namespace
 	const unsigned int START_COLOR = GetColor(255, 0, 0);
 	const float PLAYER_COLLISION_RADIUS = 15.0f; //プレイヤーの当たり判定の半径
 
+	int timer = 10000;
 	const unsigned int ENEMY_MAX = 100; //敵の最大数
 	const unsigned int ENEMY_NUM = 10; //最初に出現する敵の数
 	//Player* player = nullptr;
@@ -70,6 +71,8 @@ void Stage::Initialize()
 	stageState = 0; //タイトル画面にする
 	
 	gameScore_ = 0;
+
+	timer = 10000; //タイマー初期化
 	//変数playerは、ローカル変数なので、この関数が終わると消えてしまう。
 	//だから、newして動的に確保してる。
 	Player* player = new Player(START_POS, START_VEL, START_COLOR,
@@ -92,12 +95,22 @@ void Stage::TitleUpdate()
 	if (Input::IsKeyDown(KEY_INPUT_E))
 	{
 		stageState = 1;
-
 	}
 }
 
 void Stage::PlayUpdate()
 {
+	timer--;
+    if (timer == 0) {
+		if (gameScore_ >= 10000) {
+			stageState = 3;
+		}
+		else
+		{
+			stageState = 2; // タイマーが0になったらゲームオーバー
+		}
+    }
+	
 	//プレイ中のアップデート処理
 	//プレイヤーVS敵の当たり判定
 	Player_vs_Enemy();
@@ -124,6 +137,18 @@ void Stage::PlayUpdate()
 
 void Stage::GameOverUpdate()
 {
+	if (Input::IsKeepKeyDown(KEY_INPUT_E))
+	{
+		stageState = 0;
+	}
+}
+
+void Stage::GameClearUpdate()
+{
+	if (Input::IsKeepKeyDown(KEY_INPUT_E))
+	{
+		stageState = 0;
+	}
 }
 
 void Stage::TitleDraw()
@@ -134,6 +159,21 @@ void Stage::TitleDraw()
 	DrawString(WIN_WIDTH / 2 - 176, WIN_HEIGHT / 2 - 84, "ASTEROIDS", GetColor(255, 0, 0));
 	DrawString(WIN_WIDTH / 2 - 180, WIN_HEIGHT / 2 - 80, "ASTEROIDS", GetColor(255, 255, 255) );
 	SetFontSize(fsize);
+	static int gTimer = 0;
+	gTimer++;
+	static bool colorFlag = false;
+	if (gTimer >= 40)
+	{
+		colorFlag = !colorFlag;
+		gTimer = 0;
+	}
+	unsigned int color = colorFlag ? GetColor(0, 0, 0) : GetColor(255, 255, 255);
+	SetFontSize(20);
+	SetFontThickness(10);
+	DrawString(WIN_WIDTH / 2 - 176, WIN_HEIGHT / 2 + 16, "PRESS E KEY", GetColor(255, 0, 0));
+	DrawString(WIN_WIDTH / 2 - 176, WIN_HEIGHT / 2 + 16, "PRESS E KEY", color);
+	SetFontSize(fsize);
+	
 }
 
 void Stage::PlayDraw()
@@ -142,10 +182,47 @@ void Stage::PlayDraw()
 	int fsize = GetFontSize();
 	SetFontSize(fsize * 2);
 	DrawFormatString(10, 10, GetColor(255, 255, 255), "SCORE:%020lld", gameScore_);
+	DrawFormatString(10, 50, GetColor(255, 255, 255), "TIME:%05d", timer);
 	SetFontSize(fsize);
 }
 
 void Stage::GameOverDraw()
+{
+	{
+		static int gTimer = 0;
+		gTimer++;
+		static bool colorFlag = false;
+		if (gTimer >= 5)
+		{
+			colorFlag = !colorFlag;
+			gTimer = 0;
+		}
+		unsigned int color = colorFlag ? GetColor(255, 0, 0) : GetColor(255, 255, 255);
+		int fsize = GetFontSize();
+		SetFontSize(80);
+		SetFontThickness(10);
+		DrawString(WIN_WIDTH / 2 - 176, WIN_HEIGHT / 2 - 84, "GAME OVER", GetColor(255, 0, 0));
+		DrawString(WIN_WIDTH / 2 - 180, WIN_HEIGHT / 2 - 80, "GAME OVER", color);
+		SetFontSize(fsize);
+	}
+	static int gTimer = 0;
+	gTimer++;
+	static bool colorFlag = false;
+	if (gTimer >= 40)
+	{
+		colorFlag = !colorFlag;
+		gTimer = 0;
+	}
+	unsigned int color = colorFlag ? GetColor(0, 0, 0) : GetColor(255, 255, 255);
+	int fsize = GetFontSize();
+	SetFontSize(20);
+	SetFontThickness(10);
+	DrawString(WIN_WIDTH / 2 - 176, WIN_HEIGHT / 2 + 16, "PRESS E KEY", GetColor(255, 0, 0));
+	DrawString(WIN_WIDTH / 2 - 176, WIN_HEIGHT / 2 + 16, "PRESS E KEY", color);
+	SetFontSize(fsize);
+}
+
+void Stage::GameClearDraw()
 {
 	static int gTimer = 0;
 	gTimer++;
@@ -155,12 +232,11 @@ void Stage::GameOverDraw()
 		colorFlag = !colorFlag;
 		gTimer = 0;
 	}
-	unsigned int color = colorFlag ? GetColor(255, 0, 0) : GetColor(255, 255, 255);
+	unsigned int color = colorFlag ? GetColor(0, 0, 255) : GetColor(255, 255, 255);
 	int fsize = GetFontSize();
 	SetFontSize(80);
 	SetFontThickness(10);
-	DrawString(WIN_WIDTH / 2 - 176, WIN_HEIGHT / 2 - 84, "GAME OVER", GetColor(255,0,0));
-	DrawString(WIN_WIDTH / 2 - 180, WIN_HEIGHT / 2 - 80, "GAME OVER", color);
+	DrawString(WIN_WIDTH / 2 - 180, WIN_HEIGHT / 2 - 80, "GAME CLEAR", GetColor(255, 255, 255));
 	SetFontSize(fsize);
 }
 
@@ -181,7 +257,11 @@ void Stage::Update()
 		//ゲームオーバーのアップデート処理
 		GameOverUpdate();
 	}
-
+	else if (stageState == 3)
+	{
+		//ゲームクリアのアップデート処理
+		GameClearUpdate();
+	}
 }
 
 
@@ -320,7 +400,8 @@ void Stage::Player_vs_Enemy()
 			ExplosionEffect* effect = new ExplosionEffect(player->GetPos(), 50);
 			effect->SetCharaColor(GetColor(255, 0, 0));
 			AddObject(effect);
-
+			//if()
+			stageState = 2; //ゲームオーバーにする
 			break;
 		}
 	}
