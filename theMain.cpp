@@ -4,7 +4,7 @@
 #include "Stage.h"
 
 namespace
-{@
+{
 	const int BGCOLOR[3] = {0, 0, 51}; // ”wŒiF{ 255, 250, 205 }; // ”wŒiF
 	int crrTime;
 	int prevTime;

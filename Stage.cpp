@@ -25,8 +25,8 @@ namespace
 	int timer = 0;
 	const unsigned int ENEMY_MAX = 100; //敵の最大数
 	const unsigned int ENEMY_NUM = 10; //最初に出現する敵の数
-	int invincibleTimer = 0; // 無敵時間（フレーム数）
-	const int INVINCIBLE_TIME = 120; // 例: 2秒（60FPSなら120フレーム）
+	int mutekitimer = 0; // 無敵時間
+	const int MUTEKITIME = 600; 
 
 	//Player* player = nullptr;
 	//std::vector<Bullet*> bullets; //弾丸の保管庫
@@ -75,7 +75,7 @@ void Stage::Initialize()
 	
 	gameScore_ = 0;
 
-	timer = 5000; //タイマー初期化
+	timer = 3000; //タイマー初期化
 
 	playerlife = 3; //ライフ初期化
 	//変数playerは、ローカル変数なので、この関数が終わると消えてしまう。
@@ -97,9 +97,11 @@ void Stage::Initialize()
 
 void Stage::TitleUpdate()
 {
+	Stage::Initialize();
 	if (Input::IsKeyDown(KEY_INPUT_E))
 	{
 		stageState = 1;
+		
 	}
 }
 
@@ -146,7 +148,6 @@ void Stage::GameOverUpdate()
 	if (Input::IsKeepKeyDown(KEY_INPUT_E))
 	{
 		stageState = 0;
-		Stage::Initialize();
 		//Release(); // 独自の終了処理
 		//DxLib_End();
 	}
@@ -396,8 +397,8 @@ void Stage::Player_vs_Enemy()
 		return; //プレイヤーがいないか、死んでたらスルー
 
 	// 無敵タイマーが動いている間は当たり判定を無視
-	if (invincibleTimer > 0) {
-		invincibleTimer--;
+	if (mutekitimer > 0) {
+		mutekitimer--;
 		return;
 	}
 	
@@ -410,7 +411,7 @@ void Stage::Player_vs_Enemy()
 		//距離が近かったら当たったとする
 		if (dist < collisionDist)
 		{
-			invincibleTimer = INVINCIBLE_TIME; // 無敵時間セット
+			mutekitimer = MUTEKITIME; // 無敵時間セット
 			playerlife--;
 			if (playerlife == 0)
 			{
@@ -559,11 +560,24 @@ void Stage::ShootBullet()
 		}
 	}
 	Vector2D pos = player->GetPos();
-	Vector2D v = Math2D::Mul(player->GetDirVec(), 300.0f);
+	//Vector2D v = Math2D::Mul(player->GetDirVec(), 300.0f);
+	
 	unsigned int bcol = GetColor(255, 255, 255);
 	float r = 2;
 	float life = 2.0f;
+	// 発射角度（ラジアン）
+	float baseAngle = atan2f(player->GetDirVec().y, player->GetDirVec().x);
+	float angleOffset = DX_PI / 15.0f; // 15度
 
-	Bullet* b = new Bullet(pos, v, bcol, r, life);
-	AddObject(b);
+	// 3方向に発射
+	for (int i = -2; i <= 2; ++i)
+	{
+		float angle = baseAngle + i * angleOffset;
+		Vector2D dir = { cosf(angle), sinf(angle) };
+		Vector2D v = Math2D::Mul(dir, 300.0f);
+
+		Bullet* b = new Bullet(pos, v, bcol, r, life);
+
+		AddObject(b);
+	}
 }
