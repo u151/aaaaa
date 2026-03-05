@@ -1,5 +1,5 @@
 #include "Bullet.h"
-#include "globals.h"
+#include "globals.h" 
 #include <Dxlib.h>
 
 Bullet::Bullet(const Vector2D& pos, const Vector2D& vel,

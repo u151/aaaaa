@@ -1,7 +1,7 @@
 #pragma once
 #include "Base.h"
 
-class Player :
+class Player : 
     public Base
 {
 public:
