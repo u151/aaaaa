@@ -10,7 +10,7 @@ enum OBJ_TYPE
 	BULLET,
 	EFFECT,
 	MAX_OBJ_TYPE
-};
+}; 
 
 
 class Base

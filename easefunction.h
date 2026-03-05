@@ -2,7 +2,7 @@
 #include <cmath>
 #include <DirectXMath.h>
 #include <map>
-#include <string>
+#include <string>Å@
 #include <functional>
 
 using namespace DirectX;

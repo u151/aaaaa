@@ -5,7 +5,7 @@
 
 namespace
 {
-	const int SEGMENT_NUM = 8;//円の分割数
+	const int SEGMENT_NUM = 10;//円の分割数
 	//位置はコンストラクタでランダムに決定
 	//速度もコンストラクタでランダムに決定(範囲あり、方向と大きさ）
 	//半径もコンストラクタでランダムに決定（範囲あり)
@@ -23,7 +23,7 @@ Enemy::Enemy(int segment)
 	:Base(), segment_(segment), isAlive_(true)
 {
 	//pos_を画面内のランダムな位置に設定
-	pos_ = { (float)GetRand(WIN_WIDTH - 1), (float)GetRand(WIN_HEIGHT - 1)};
+		pos_ = { (float)GetRand(WIN_WIDTH - 1), (float)GetRand(WIN_HEIGHT - 1) };
 	//x,yともに-100から100の間のランダムな速度
 	vel_ = { (float)(GetRand(200) - 100), (float)(GetRand(200) - 100) };
 	Color_ = GetColor(255, 255, 255); //白

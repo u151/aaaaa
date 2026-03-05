@@ -3,7 +3,7 @@
 Base::Base()
 	:pos_(0.0f, 0.0f), vel_(0.0f, 0.0f), Color_(0xffffffff), objType(UNKNOWN)
 {
-	//SetObjType(UNKNOWN);
+	//SetObjType(UNKNOWN);Å@Å@Å@
 }
 
 Base::Base(const Vector2D& pos, const Vector2D& vel,

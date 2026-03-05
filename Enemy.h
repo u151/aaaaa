@@ -11,7 +11,7 @@ public:
 		LARGE,
 		MEDIUM,
 		SMALL
-	};
+	}; 
     Enemy(int segment);
 	Enemy(Size size, int segment);
 	Enemy(const Vector2D& pos, const Vector2D& vel, Size size, int segment);

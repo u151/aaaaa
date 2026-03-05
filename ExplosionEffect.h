@@ -8,7 +8,7 @@ class ExplosionEffect :
 public:
 	ExplosionEffect(const Vector2D& pos, int particleCount = 20);
 	~ExplosionEffect() = default;
-	void Update() override;
+	void Update() override; 
 	void Draw() override;
 	bool IsFinished() const { return isFinished_; }
 

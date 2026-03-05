@@ -21,10 +21,13 @@ namespace
 	const float START_OMEGA = 2.0f;
 	const unsigned int START_COLOR = GetColor(255, 0, 0);
 	const float PLAYER_COLLISION_RADIUS = 15.0f; //プレイヤーの当たり判定の半径
-
-	int timer = 10000;
+	int playerlife = 3;
+	int timer = 0;
 	const unsigned int ENEMY_MAX = 100; //敵の最大数
 	const unsigned int ENEMY_NUM = 10; //最初に出現する敵の数
+	int invincibleTimer = 0; // 無敵時間（フレーム数）
+	const int INVINCIBLE_TIME = 120; // 例: 2秒（60FPSなら120フレーム）
+
 	//Player* player = nullptr;
 	//std::vector<Bullet*> bullets; //弾丸の保管庫
 	//std::vector<Enemy*> enemies; //敵の保管庫
@@ -72,7 +75,9 @@ void Stage::Initialize()
 	
 	gameScore_ = 0;
 
-	timer = 10000; //タイマー初期化
+	timer = 5000; //タイマー初期化
+
+	playerlife = 3; //ライフ初期化
 	//変数playerは、ローカル変数なので、この関数が終わると消えてしまう。
 	//だから、newして動的に確保してる。
 	Player* player = new Player(START_POS, START_VEL, START_COLOR,
@@ -100,16 +105,7 @@ void Stage::TitleUpdate()
 
 void Stage::PlayUpdate()
 {
-	timer--;
-    if (timer == 0) {
-		if (gameScore_ >= 10000) {
-			stageState = 3;
-		}
-		else
-		{
-			stageState = 2; // タイマーが0になったらゲームオーバー
-		}
-    }
+	
 	
 	//プレイ中のアップデート処理
 	//プレイヤーVS敵の当たり判定
@@ -133,6 +129,16 @@ void Stage::PlayUpdate()
 		ShootBullet();
 	}
 
+	timer--;
+	if (timer == 0) {
+		if (gameScore_ >= 10000) {
+			stageState = 3;
+		}
+		else
+		{
+			stageState = 2; // タイマーが0になったらゲームオーバー
+		}
+	}
 }
 
 void Stage::GameOverUpdate()
@@ -140,6 +146,9 @@ void Stage::GameOverUpdate()
 	if (Input::IsKeepKeyDown(KEY_INPUT_E))
 	{
 		stageState = 0;
+		Stage::Initialize();
+		//Release(); // 独自の終了処理
+		//DxLib_End();
 	}
 }
 
@@ -183,6 +192,7 @@ void Stage::PlayDraw()
 	SetFontSize(fsize * 2);
 	DrawFormatString(10, 10, GetColor(255, 255, 255), "SCORE:%020lld", gameScore_);
 	DrawFormatString(10, 50, GetColor(255, 255, 255), "TIME:%05d", timer);
+	DrawFormatString(10, 90, GetColor(255, 255, 255), "LIFE:%d", playerlife);
 	SetFontSize(fsize);
 }
 
@@ -385,6 +395,12 @@ void Stage::Player_vs_Enemy()
 	if (player == nullptr || player->IsAlive() == false)
 		return; //プレイヤーがいないか、死んでたらスルー
 
+	// 無敵タイマーが動いている間は当たり判定を無視
+	if (invincibleTimer > 0) {
+		invincibleTimer--;
+		return;
+	}
+	
 	for(auto& enemy : aliveEnemies)
 	{
 		//①敵とプレイヤーの距離を計算
@@ -394,15 +410,19 @@ void Stage::Player_vs_Enemy()
 		//距離が近かったら当たったとする
 		if (dist < collisionDist)
 		{
-			//プレイヤーを死なせる
-			player->Dead();
-			//赤いエフェクトを生成
-			ExplosionEffect* effect = new ExplosionEffect(player->GetPos(), 50);
-			effect->SetCharaColor(GetColor(255, 0, 0));
-			AddObject(effect);
-			//if()
-			stageState = 2; //ゲームオーバーにする
-			break;
+			invincibleTimer = INVINCIBLE_TIME; // 無敵時間セット
+			playerlife--;
+			if (playerlife == 0)
+			{
+				//プレイヤーを死なせる
+				player->Dead();
+				//赤いエフェクトを生成
+				ExplosionEffect* effect = new ExplosionEffect(player->GetPos(), 50);
+				effect->SetCharaColor(GetColor(255, 0, 0));
+				AddObject(effect);
+				stageState = 2; //ゲームオーバーにする
+				break;
+			}
 		}
 	}
 
@@ -424,6 +444,11 @@ void Stage::Draw()
 	{
 		//ゲームオーバーの描画処理
 		GameOverDraw();
+	}
+	else if (stageState == 3)
+	{
+		//ゲームクリアの描画処理
+		GameClearDraw();
 	}
 }
 

@@ -127,7 +127,7 @@ void Player::Update()
 	if (pos_.y > WIN_HEIGHT) pos_.y = 0;
 
 }
-
+Å@
 void Player::Draw()
 {
 	if(IsAlive() == false)

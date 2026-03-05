@@ -57,7 +57,7 @@ void ExplosionEffect::Update()
 		//寿命が残ってたら更新
 		if (particle.life > 0.0f)
 		{
-			allDead = false;//まだ生きてるパーティクルがある
+			allDead = false;//まだ生きてるパーティクルがある　
 
 			//位置更新
 			particle.Offset = Math2D::Add(particle.Offset, Math2D::Mul(particle.vel, dt));
