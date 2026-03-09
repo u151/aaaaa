@@ -235,19 +235,36 @@ void Stage::GameOverDraw()
 
 void Stage::GameClearDraw()
 {
+	{
+		static int gTimer = 0;
+		gTimer++;
+		static bool colorFlag = false;
+		if (gTimer >= 5)
+		{
+			colorFlag = !colorFlag;
+			gTimer = 0;
+		}
+		unsigned int color = colorFlag ? GetColor(0, 0, 255) : GetColor(255, 255, 255);
+		int fsize = GetFontSize();
+		SetFontSize(80);
+		SetFontThickness(10);
+		DrawString(WIN_WIDTH / 2 - 180, WIN_HEIGHT / 2 - 80, "GAME CLEAR", GetColor(255, 255, 255));
+		SetFontSize(fsize);
+	}
 	static int gTimer = 0;
 	gTimer++;
 	static bool colorFlag = false;
-	if (gTimer >= 5)
+	if (gTimer >= 40)
 	{
 		colorFlag = !colorFlag;
 		gTimer = 0;
 	}
-	unsigned int color = colorFlag ? GetColor(0, 0, 255) : GetColor(255, 255, 255);
+	unsigned int color = colorFlag ? GetColor(0, 0, 0) : GetColor(255, 255, 255);
 	int fsize = GetFontSize();
-	SetFontSize(80);
+	SetFontSize(20);
 	SetFontThickness(10);
-	DrawString(WIN_WIDTH / 2 - 180, WIN_HEIGHT / 2 - 80, "GAME CLEAR", GetColor(255, 255, 255));
+	DrawString(WIN_WIDTH / 2 - 176, WIN_HEIGHT / 2 + 16, "PRESS E KEY", GetColor(255, 0, 0));
+	DrawString(WIN_WIDTH / 2 - 176, WIN_HEIGHT / 2 + 16, "PRESS E KEY", color);
 	SetFontSize(fsize);
 }
 
@@ -560,24 +577,12 @@ void Stage::ShootBullet()
 		}
 	}
 	Vector2D pos = player->GetPos();
-	//Vector2D v = Math2D::Mul(player->GetDirVec(), 300.0f);
-	
+	Vector2D v = Math2D::Mul(player->GetDirVec(), 300.0f);
 	unsigned int bcol = GetColor(255, 255, 255);
 	float r = 2;
 	float life = 2.0f;
-	// 発射角度（ラジアン）
-	float baseAngle = atan2f(player->GetDirVec().y, player->GetDirVec().x);
-	float angleOffset = DX_PI / 15.0f; // 15度
 
-	// 3方向に発射
-	for (int i = -2; i <= 2; ++i)
-	{
-		float angle = baseAngle + i * angleOffset;
-		Vector2D dir = { cosf(angle), sinf(angle) };
-		Vector2D v = Math2D::Mul(dir, 300.0f);
-
-		Bullet* b = new Bullet(pos, v, bcol, r, life);
-
-		AddObject(b);
-	}
+	Bullet* b = new Bullet(pos, v, bcol, r, life);
+	AddObject(b);
 }
+
