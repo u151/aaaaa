@@ -26,7 +26,7 @@ namespace
 	const unsigned int ENEMY_MAX = 100; //“G‚ÌÅ‘å”
 	const unsigned int ENEMY_NUM = 10; //Å‰‚ÉoŒ»‚·‚é“G‚Ì”
 	int mutekitimer = 0; // –³“GŠÔ
-	const int MUTEKITIME = 600; 
+	const int MUTEKITIME = 400; 
 
 	//Player* player = nullptr;
 	//std::vector<Bullet*> bullets; //’eŠÛ‚Ì•ÛŠÇŒÉ
@@ -581,6 +581,7 @@ void Stage::ShootBullet()
 	unsigned int bcol = GetColor(255, 255, 255);
 	float r = 2;
 	float life = 2.0f;
+	//atan2f(player->GetDirVec().y, player->GetDirVec().x);
 
 	Bullet* b = new Bullet(pos, v, bcol, r, life);
 	AddObject(b);
